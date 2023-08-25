@@ -20,5 +20,5 @@ embeddings: Type[ndarray] = model.encode(sentences, convert_to_numpy=True)
 
 print("Generated Embeddings from sentence \n", embeddings)
 
-np.asarray(embeddings)
+np.asarray(embeddings, np.float32)
 np.savetxt("test_data.csv", embeddings, delimiter=",")
