@@ -34,7 +34,7 @@ if __name__ == "__main__":
     # generate_test_data(dataset, "dataset")
 
     dataset = np.loadtxt("dataset.csv", dtype=np.float64, delimiter=",")
-    questions = np.loadtxt("question.csv", dtype=np.float64, delimiter=",")
+    questions = np.loadtxt("questions.csv", dtype=np.float64, delimiter=",")
 
     rankings = []
     for question in questions:
