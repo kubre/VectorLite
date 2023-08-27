@@ -2,17 +2,34 @@
 
 from sentence_transformers import SentenceTransformer
 
-from numpy import ndarray
 import numpy as np
-from typing import Type
+import csv
 
 
 def generate_test_data(sentences: list[str], filename: str):
     model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-    embeddings: Type[ndarray] = model.encode(sentences, convert_to_numpy=True)
+    embeddings = model.encode(sentences, convert_to_numpy=True)
+    new_embeddings = [
+        [sentence, *embedding] for sentence, embedding in zip(sentences, embeddings)
+    ]
 
-    np.asarray(embeddings, np.float64)
-    np.savetxt(f"{filename}.csv", embeddings, delimiter=",")
+    with open(filename, "w", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerows(new_embeddings)
+
+    # np.savetxt(f"{filename}.csv", new_embeddings, delimiter=",")
+
+
+def load_data_from_file(filename: str):
+    temp = []
+    with open(filename, "r", encoding="utf-8", newline="") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            temp2 = [row[0]]
+            for value in row[1:]:
+                temp2.append(float(value))
+            temp.append(temp2)
+    return temp
 
 
 def cosine_similarity(a: np.array, b: np.array):
@@ -20,7 +37,7 @@ def cosine_similarity(a: np.array, b: np.array):
 
 
 if __name__ == "__main__":
-    dataset = [
+    text_sentences = [
         "Chandrayaan-3 is the third Indian lunar exploration mission under the Indian Space Research Organisation's (ISRO) Chandrayaan programme.",
         "Chandrayaan-3 was launched on 14 July 2023.",
         "On 22 July 2019, ISRO launched Chandrayaan-2",
@@ -29,21 +46,25 @@ if __name__ == "__main__":
         "Confirming the existence of the project, ISRO's former chairman K. Sivan stated that the estimated cost would be around ₹615 crore (equivalent to ₹721 crore or US$90 million in 2023).",
     ]
 
-    questions = ["Name of the space programme", "Number of wheels of vehicle"]
+    text_questions = ["Name of the space programme", "Number of wheels of vehicle"]
 
-    # generate_test_data(dataset, "dataset")
+    # sentences = generate_test_data(text_sentences, "sentences.csv")
+    # questions = generate_test_data(text_questions, "questions.csv")
 
-    dataset = np.loadtxt("dataset.csv", dtype=np.float64, delimiter=",")
-    questions = np.loadtxt("questions.csv", dtype=np.float64, delimiter=",")
+    sentences = load_data_from_file("sentences.csv")
+    questions = load_data_from_file("questions.csv")
 
     rankings = []
     for question in questions:
         temp = []
-        for sentence in dataset:
-            temp.append(cosine_similarity(question, sentence))
+        for sentence in sentences:
+            temp.append([sentence[0], cosine_similarity(question[1:], sentence[1:])])
         rankings.append(temp)
 
-    print(rankings)
+    for rank in rankings:
+        data = sorted(rank, key=lambda x: x[1], reverse=True)
+        print(data[0])
+
 
 """ Test Match using consine run
 1.

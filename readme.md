@@ -25,3 +25,4 @@ Querying
 Storing
 
 -   How to store vector format
+    - Store test data into csv files from python with index and paragraph
