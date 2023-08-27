@@ -25,14 +25,14 @@ func main() {
 	fmt.Println(rankings)
 }
 
-func readCsvIntoSlice(name string) []Vector {
+func readCsvIntoSlice(name string) []Record {
 	file, err := os.Open(name)
 	if err != nil {
 		log.Fatal("Cannot read the file", err)
 	}
 
 	r := csv.NewReader(file)
-	embeddings := []Vector{}
+	embeddings := []Record{}
 
 	for {
 		record, err := r.Read()
@@ -56,9 +56,9 @@ func readCsvIntoSlice(name string) []Vector {
 	return embeddings
 }
 
-func convertStringListToFloats(record []string) Vector {
-	tempEmbedding := Vector{
-		data: make([]float64, len(record)),
+func convertStringListToFloats(record []string) Record {
+	tempEmbedding := Record{
+		index: make([]float64, len(record)),
 	}
 
 	for i, value := range record {
@@ -67,7 +67,7 @@ func convertStringListToFloats(record []string) Vector {
 			log.Fatal(err)
 		}
 
-		tempEmbedding.data[i] = point
+		tempEmbedding.index[i] = point
 	}
 	return tempEmbedding
 }
