@@ -3,8 +3,9 @@ package main
 import "math"
 
 type Record struct {
-	index  []float64
-	normal float64
+	index    []float64
+	metadata map[string]interface{}
+	normal   float64
 }
 
 func (r Record) cosine_similarity(w Record) float64 {

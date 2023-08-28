@@ -6,26 +6,40 @@ import (
 	"io"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 )
 
-func main() {
-	dataset := readCsvIntoSlice("dataset.csv")
-	questions := readCsvIntoSlice("questions.csv")
+type Output struct {
+	text string
+	rank float32
+}
 
-	rankings := make([][]float64, len(questions))
+func main() {
+	dataset := readCsvIntoRecords("sentences.csv")
+	questions := readCsvIntoRecords("questions.csv")
+
+	rankings := make([][]Output, len(questions))
 	for i, question := range questions {
-		temp := make([]float64, len(dataset))
+		temp := make([]Output, len(dataset))
 		for j, sentence := range dataset {
 			score := question.cosine_similarity(sentence)
-			temp[j] = score
+			temp[j] = Output{text: sentence.metadata["text"].(string), rank: float32(score)}
 		}
 		rankings[i] = temp
 	}
+
+	// Sorting for testing
+	for _, ranks := range rankings {
+		sort.Slice(ranks, func(i, j int) bool {
+			return ranks[i].rank > ranks[j].rank
+		})
+	}
+
 	fmt.Println(rankings)
 }
 
-func readCsvIntoSlice(name string) []Record {
+func readCsvIntoRecords(name string) []Record {
 	file, err := os.Open(name)
 	if err != nil {
 		log.Fatal("Cannot read the file", err)
@@ -35,12 +49,12 @@ func readCsvIntoSlice(name string) []Record {
 	embeddings := []Record{}
 
 	for {
-		record, err := r.Read()
+		row, err := r.Read()
 		if err == io.EOF {
 			break
 		}
 
-		tempEmbedding := convertStringListToFloats(record)
+		tempEmbedding := readRecord(row)
 
 		if err != nil {
 			log.Fatal("Error reading file", err)
@@ -56,12 +70,13 @@ func readCsvIntoSlice(name string) []Record {
 	return embeddings
 }
 
-func convertStringListToFloats(record []string) Record {
+func readRecord(row []string) Record {
 	tempEmbedding := Record{
-		index: make([]float64, len(record)),
+		index:    make([]float64, len(row)-1),
+		metadata: map[string]interface{}{"text": row[0]},
 	}
 
-	for i, value := range record {
+	for i, value := range row[1:] {
 		point, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			log.Fatal(err)
