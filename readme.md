@@ -1,6 +1,12 @@
-# VDB: Simple Vector Database
+# VectorLite: Simple Vector Database
 
 Database for storing any querying the embeddings and metadata alongside it.
+
+## WIP: Just toy project as of now not even in working state
+
+**To Run:** `go run main.go record.go`
+
+There is also python file to generate and test with embeddings as of now
 
 ## Development Log (26 Aug 2023)
 
@@ -21,8 +27,10 @@ Querying
     -   Formula: dot(v, w) / (v.norm() \* w.norm())
         -   dot v w: sum(vi \* wi)
         -   norm v: sqrt(sum(vi \* vi))
+-   Euclidean Distance
+-   Dot Product
 
 Storing
 
 -   How to store vector format
-    - Store test data into csv files from python with index and paragraph
+    -   Store test data into csv files from python with index and paragraph
